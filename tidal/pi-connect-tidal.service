@@ -1,12 +1,11 @@
 [Unit]
-Description=Tidal Connect Service*
-
+Description=Tidal Connect Service
 [Service]
 Restart=on-failure
 ExecStart=/usr/pi-connect/tidal_connect \
                 --tc-certificate-path "/usr/pi-connect/ZenStream.dat" \
                 --netif-for-deviceid eth0 \
-                -f "Raspbery Pi Connect“ \
+                -f "Raspbery Pi Connect" \
                 --codec-mpegh true \
                 --codec-mqa false \
                 --model-name "Raspberry Pi 2" \
@@ -18,7 +17,6 @@ ExecStart=/usr/pi-connect/tidal_connect \
 User=root
 Group=root
 RestartSec=1
-KillMode=control-group*
-
+KillMode=control-group
 [Install]
-WantedBy=multi-user.target*
+WantedBy=multi-user.target
