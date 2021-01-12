@@ -10,7 +10,9 @@ We will be using [Ubuntu Server 18.04](http://cdimage.ubuntu.com/ubuntu/releases
 ## Install Required Dependencies
 
 Tidal connect requires libcurl3 and curl. By default, the Ubuntu 18.04 repositories install libcurl4 when curl is installed. The following repository provides a curl version that supports both libcurl3 and libcurl4
-`sudo add-apt-repository ppa:xapienz/curl34`
+```
+sudo add-apt-repository ppa:xapienz/curl34
+```
 
 Upgrade your fresh install
 ```
@@ -95,8 +97,7 @@ Number of devices = 4
 
 ## Tidal Connect Systemd Service
 
-The service description must be adapted to fit your needs. We must change the "--playback-device" to match your system. 
-`sudo nano /usr/pi-connect/tidal/pi-connect-tidal.service`
+The service description must be adapted to fit your needs. We must change the "--playback-device" to match your system in `/usr/pi-connect/tidal/pi-connect-tidal.service`
 
 ```
 [Unit]
@@ -164,4 +165,48 @@ wget http://download.roonlabs.com/builds/roonbridge-installer-linuxarmv7hf.sh
 chmod +x roonbridge-installer-linuxarmv7hf.sh
 sudo ./roonbridge-installer-linuxarmv7hf.sh
 rm roonbridge-installer-linuxarmv7hf.sh
+```
+
+
+
+# Plexamp
+
+## server.json file
+
+We need to acquire a server.json file from an existing Plexamp 1.0 install. 
+1. Download Plexamp 1.0 for your OS flavor: [Windows](http://web.archive.org/web/20180109153237/https://plexamp.plex.tv/plexamp.plex.tv/Plexamp%20Setup%201.0.0.exe), [MacOS](http://web.archive.org/web/20180109153237/https://plexamp.plex.tv/plexamp.plex.tv/Plexamp-1.0.0.dmg), [Linux](http://web.archive.org/web/20180829181913/https://plexamp.plex.tv/plexamp.plex.tv/plexamp-1.0.5-x86_64.AppImage)
+1. Once installed, sign-in and acquire the server.json file that was just created.
+1. Place the server.json file on the Raspberry Pi in folder /home/ubuntu/.config/Plexamp/
+1. On the device from which you acquired the server.json file, sign out and back into your existing Plexamp install in order to get a new identifier/token.
+
+
+## Install Node 9
+
+```
+curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
+sudo apt install -y nodejs
+```
+
+
+## Plexamp Connect Systemd Service
+
+Copy the service file into place
+```
+sudo cp /usr/pi-connect/plexamp/pi-connect-plexamp.service /lib/systemd/system/
+```
+
+Start the Plexamp client 
+```
+sudo systemctl daemon-reload
+sudo systemctl start pi-connect-plexamp.service
+```
+    
+Check the status
+```
+sudo systemctl status pi-connect-plexamp.service
+```
+
+Optionally, you can have Plexamp client start on boot
+```
+sudo systemctl enable pi-connect-plexamp.service
 ```
