@@ -1,0 +1,24 @@
+[Unit]
+Description=Tidal Connect Service*
+
+[Service]
+Restart=on-failure
+ExecStart=/usr/pi-connect/tidal_connect \
+                --tc-certificate-path "/usr/pi-connect/ZenStream.dat" \
+                --netif-for-deviceid eth0 \
+                -f "Raspbery Pi Connect“ \
+                --codec-mpegh true \
+                --codec-mqa false \
+                --model-name "Raspberry Pi 2" \
+                --disable-app-security false \
+                --disable-web-security false \
+                --enable-mqa-passthrough false \
+                --playback-device "snd_rpi_hifiberry_digi: HifiBerry Digi HiFi wm8804-spdif-0 (hw:0,0)" \
+                --log-level 3
+User=root
+Group=root
+RestartSec=1
+KillMode=control-group*
+
+[Install]
+WantedBy=multi-user.target*

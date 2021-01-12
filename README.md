@@ -1,1 +1,121 @@
-# ifi-tidal-release
+# Raspberry Pi as an audio audio streamer for [Tidal](https://github.com/ppy2/ifi-tidal-release), [Spotify](https://github.com/dtcooper/raspotify), [Plex](https://forums.plex.tv/t/plexamp-for-raspberry-pi-release-notes/368282), and/or [Roon Bridge](https://help.roonlabs.com/portal/en/kb/articles/linux-install#Downloads)
+
+
+
+# Ubuntu Server 20.04
+
+We will be using [Ubuntu Server 20.04](https://ubuntu.com/download/raspberry-pi) as the OS for our audio streaming Raspberry Pi. I am using a Raspbery Pi 2 but this tutorial should apply to Raspberry Pi's 3 and 4 using the appropriate 32-bit OS.
+
+
+## Install Required Dependencies
+
+Tidal connect requires libcurl3. By default, the Ubuntu 20.04 repositories include libcurl4. The following repository provides a curl version that supports both curl3 `sudo add-apt-repository ppa:xapienz/curl34`
+`sudo apt-get update`
+
+Now install the required dependancies
+`sudo apt install alsa-utils libssl1.0.0 libportaudio2 libflac++6v5 avahi-daemon libavformat57 libavahi-client3 curl`
+
+
+## Sound Card Setup
+
+If you are not using a Raspberry Pi DAC or HAT, you can skip this step. If you are, you will need make the device usable in Ubuntu.
+I have a HifiBerry Digi+ HAT. In order for Unbuntu to recognize it, edit `/boot/firmware/config.txt` and add:
+`dtoverlay=hifiberry-digi`
+
+reboot the device
+`sudo reboot`
+
+
+
+# Tidal
+
+## Download the Repository
+
+`sudo git clone https://github.com/danofun/pi-connect.git /usr/pi-connect2`
+
+
+## Determine Audio Device Name
+Run the following command to determine the name of your audio device
+`/usr/pi-connect/pa-devs-get`
+
+In sample output below, the name of our devcie is `snd_rpi_hifiberry_digi: HifiBerry Digi HiFi wm8804-spdif-0 (hw:0,0)`. Determine your device name as we will use it in the next step.
+
+```
+ubuntu@ubuntu:/usr/pi-connect$ /usr/pi-connect/pa_devs/bin/ifi-pa-devs-get
+ALSA lib pcm.c:2642:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.front
+ALSA lib pcm.c:2642:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.rear
+ALSA lib pcm.c:2642:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.center_lfe
+ALSA lib pcm.c:2642:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.side
+ALSA lib pcm.c:2642:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.surround21
+ALSA lib pcm.c:2642:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.surround21
+ALSA lib pcm.c:2642:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.surround40
+ALSA lib pcm.c:2642:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.surround41
+ALSA lib pcm.c:2642:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.surround50
+ALSA lib pcm.c:2642:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.surround51
+ALSA lib pcm.c:2642:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.surround71
+ALSA lib pcm.c:2642:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.iec958
+ALSA lib pcm.c:2642:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.iec958
+ALSA lib pcm.c:2642:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.iec958
+ALSA lib pcm.c:2642:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.hdmi
+ALSA lib pcm.c:2642:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.hdmi
+ALSA lib pcm.c:2642:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.modem
+ALSA lib pcm.c:2642:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.modem
+ALSA lib pcm.c:2642:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.phoneline
+ALSA lib pcm.c:2642:(snd_pcm_open_noupdate) Unknown PCM cards.pcm.phoneline
+Cannot connect to server socket err = No such file or directory
+Cannot connect to server request channel
+jack server is not running or cannot be started
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for -1, skipping unlock
+device#0=snd_rpi_hifiberry_digi: HifiBerry Digi HiFi wm8804-spdif-0 (hw:0,0)
+device#1=sysdefault
+device#2=default
+device#3=dmix
+Number of devices = 4
+```
+
+
+## Tidal Connect Systemd Service
+The service description must be adapted to fit your needs. We must change the "--playback-device" to match your system. 
+`sudo nano /usr/pi-connect/pi-connect-tidal.service`
+
+```
+[Unit]
+Description=Tidal Connect Service*
+
+[Service]
+Restart=on-failure
+ExecStart=/usr/pi-connect/tidal_connect \
+                --tc-certificate-path "/usr/pi-connect/ZenStream.dat" \
+                --netif-for-deviceid eth0 \
+                -f "Raspbery Pi Connect“ \
+                --codec-mpegh true \
+                --codec-mqa false \
+                --model-name "Raspberry Pi 2" \
+                --disable-app-security false \
+                --disable-web-security false \
+                --enable-mqa-passthrough false \
+                --playback-device "snd_rpi_hifiberry_digi: HifiBerry Digi HiFi wm8804-spdif-0 (hw:0,0)" \
+                --log-level 3
+User=root
+Group=root
+RestartSec=1
+KillMode=control-group*
+
+[Install]
+WantedBy=multi-user.target*
+```
+
+
+Once edited, copy the file into place
+`sudo cp /usr/pi-connect/pi-connect-tidal.service /lib/systemd/system/`
+
+Start the Tidal Connect client 
+`sudo systemctl daemon-reload`
+`sudo systemctl start pi-connect-tidal.service`
+    
+Check the status
+`sudo systemctl status pi-connect-tidal.service`
+
+Optionally, you can have Tidal Connect client start on boot
+`sudo systemctl enable pi-connect-tidal.service`
