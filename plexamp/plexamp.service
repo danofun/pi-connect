@@ -1,0 +1,15 @@
+[Unit]
+Description=Plexamp
+After=network.target
+
+[Service]
+Environment="PLUGIN_PATH=/usr/pi-connect/plexamp/server/node_modules/treble/build/Release/"
+Environment="LD_LIBRARY_PATH=/usr/pi-connect/plexamp/server/node_modules/treble/build/Release/"
+Type=simple
+User=root
+ExecStart=/usr/bin/node /usr/pi-connect/plexamp/server/server.prod.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+

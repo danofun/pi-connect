@@ -2,8 +2,8 @@
 Description=Tidal Connect Service
 [Service]
 Restart=on-failure
-ExecStart=/usr/pi-connect/tidal_connect \
-                --tc-certificate-path "/usr/pi-connect/ZenStream.dat" \
+ExecStart=/usr/pi-connect/tidal/tidal_connect \
+                --tc-certificate-path "/usr/pi-connect/tidal/zenstream.dat" \
                 --netif-for-deviceid eth0 \
                 -f "Raspbery Pi Connect" \
                 --codec-mpegh true \
