@@ -4,7 +4,7 @@
 
 # Ubuntu Server 18.04
 
-We will be using [Ubuntu Server 18.04](http://cdimage.ubuntu.com/ubuntu/releases/bionic/release/) as the OS for our audio streaming Raspberry Pi. I am using a Raspbery Pi 2 and ubuntu-18.04.5-preinstalled-server-armhf+raspi2.img.xz but this tutorial should apply to Raspberry Pi's 3 and 4 using the appropriate 32-bit OS.
+We will be using [Ubuntu Server 18.04](http://cdimage.ubuntu.com/ubuntu/releases/bionic/release/) as the OS for our audio streaming Raspberry Pi. I am using a Raspbery Pi 2 and `ubuntu-18.04.5-preinstalled-server-armhf+raspi2.img.xz` but this tutorial should apply to Raspberry Pi's 3 and 4 using the appropriate 32-bit OS.
 
 
 ## Install Required Dependencies
@@ -14,7 +14,7 @@ Tidal connect requires libcurl3 and curl. By default, the Ubuntu 18.04 repositor
 sudo add-apt-repository ppa:xapienz/curl34
 ```
 
-Upgrade your fresh install
+Upgrade your server install
 ```
 sudo apt update && sudo apt dist-upgrade -y
 ```
@@ -39,16 +39,17 @@ sudo reboot
 ```
 
 
-
-# Tidal
-
-[ppy2](https://github.com/ppy2) had compiled the files necessary to turn a Raspberry Pi into a Tidal Connect client. This repo contains a consolidation of this effort.
-
 ## Download this Repository
 
 ```
 sudo git clone https://github.com/danofun/pi-connect.git /usr/pi-connect
 ```
+
+
+
+# Tidal
+
+[ppy2](https://github.com/ppy2) had compiled the files necessary to turn a Raspberry Pi into a Tidal Connect client. This repo contains a consolidation of this effort.
 
 
 ## Determine Audio Device Name
@@ -175,9 +176,9 @@ rm roonbridge-installer-linuxarmv7hf.sh
 
 We need to acquire a server.json file from an existing Plexamp 1.0 install. 
 1. Download Plexamp 1.0 for your OS flavor: [Windows](http://web.archive.org/web/20180109153237/https://plexamp.plex.tv/plexamp.plex.tv/Plexamp%20Setup%201.0.0.exe), [MacOS](http://web.archive.org/web/20180109153237/https://plexamp.plex.tv/plexamp.plex.tv/Plexamp-1.0.0.dmg), [Linux](http://web.archive.org/web/20180829181913/https://plexamp.plex.tv/plexamp.plex.tv/plexamp-1.0.5-x86_64.AppImage)
-1. Once installed, sign-in and acquire the server.json file that was just created.
-1. Place the server.json file on the Raspberry Pi in folder /home/ubuntu/.config/Plexamp/
-1. On the device from which you acquired the server.json file, sign out and back into your existing Plexamp install in order to get a new identifier/token.
+1. Once Plexamp is installed, sign-in and acquire the server.json file that was just created. MacOS location is `~/Library/Application Support/Plexamp/server.json`
+1. Place the server.json file on the Raspberry Pi in folder `/home/ubuntu/.config/Plexamp/`
+1. On the device from which you acquired the server.json file, sign out and back into your existing Plexamp install in order to generate a new identifier/token.
 
 
 ## Install Node 9
